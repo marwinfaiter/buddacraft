@@ -4,6 +4,8 @@
 # BUILD:             Which build number of above version to run, defaults to latest
 # RAM:               How much RAM to allocate, default to 1G
 # JAVA_OPTS:         Optional java options, you should know what you're doing
+# PUID:              UID to run as
+# PGID:              GID to run as
 name: minecraft
 services:
   buddacraft:

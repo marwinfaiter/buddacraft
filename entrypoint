@@ -2,10 +2,10 @@
 
 # Create buddacraft user
 PUID=${PUID:-9999}
-GUID=${GUID:-9999}
+PGID=${PGID:-9999}
 
-groupadd -g $GUID buddacraft
-useradd -g $GUID -u $PUID buddacraft
+groupadd -g $PGID buddacraft
+useradd -g $PGID -u $PUID buddacraft
 
 # Perform initial setup
 urlPrefix=https://papermc.io/api/v2/projects/paper
