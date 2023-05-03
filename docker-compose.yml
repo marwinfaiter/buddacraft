@@ -6,21 +6,15 @@
 # JAVA_OPTS:         Optional java options, you should know what you're doing
 name: minecraft
 services:
-  infrared:
-    image: haveachin/infrared
-    ports:
-      - 25565:25565
-      - 25565:25565/udp
-    volumes:
-      - ./minecraft/infrared/data:/configs
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: always
   buddacraft:
     image: marwinfaiter/buddacraft
     build: .
     environment:
       RAM: 3G
       VERSION: 1.18.2
+    ports:
+      - 25565:25565
+      - 25565:25565/udp
     volumes:
       - ./data:/buddacraft
     stdin_open: true

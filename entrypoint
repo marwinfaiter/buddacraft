@@ -1,11 +1,18 @@
 #!/bin/bash
 
+# Create buddacraft user
+PUID=${PUID:-9999}
+GUID=${GUID:-9999}
+
+groupadd -g $GUID buddacraft
+useradd -g $GUID -u $PUID buddacraft
+
 # Perform initial setup
 urlPrefix=https://papermc.io/api/v2/projects/paper
-${VERSION:=latest}
-${BUILD:=latest}
-${JAVA_OPTS:=-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true}
-${RAM:=1G}
+VERSION=${VERSION:-latest}
+BUILD=${BUILD:-latest}
+JAVA_OPTS=${JAVA_OPTS:--XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true}
+RAM=${RAM:-1G}
 
 if [ ${VERSION} = latest ]
   then
@@ -21,14 +28,16 @@ fi
 
 JAR_NAME=papermc-${VERSION}-${BUILD}.jar
 
+runuser -u buddacraft -- mkdir versions
+
 if [ ! -e "versions/${JAR_NAME}" ]
   then
-    wget ${urlPrefix}/builds/${BUILD}/downloads/paper-${VERSION}-${BUILD}.jar -O "versions/${JAR_NAME}"
+    runuser -u buddacraft -- wget ${urlPrefix}/builds/${BUILD}/downloads/paper-${VERSION}-${BUILD}.jar -O "versions/${JAR_NAME}"
     if [ ! -e eula.txt ]
     then
-      java -jar ${JAR_NAME}
-      sed -i 's/false/true/g' eula.txt
+      runuser -u buddacraft -- java -jar versions/${JAR_NAME}
     fi
 fi
+sed -i 's/false/true/g' eula.txt
 
-exec java -Xms${RAM} -Xmx${RAM} ${JAVA_OPTS} -jar "versions/${JAR_NAME}" nogui
+exec runuser -u buddacraft -- java -Xms${RAM} -Xmx${RAM} ${JAVA_OPTS} -jar "versions/${JAR_NAME}" nogui
