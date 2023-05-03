@@ -1,0 +1,27 @@
+# Environment variables
+# TZ:                Which timezone to use, defaults to Europe/Stockholm
+# VERSION:           Which version of papercraft to run, defaults to latest
+# BUILD:             Which build number of above version to run, defaults to latest
+# RAM:               How much RAM to allocate, default to 1G
+# JAVA_OPTS:         Optional java options, you should know what you're doing
+name: minecraft
+services:
+  infrared:
+    image: haveachin/infrared
+    ports:
+      - 25565:25565
+      - 25565:25565/udp
+    volumes:
+      - ./minecraft/infrared/data:/configs
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+  buddacraft:
+    image: marwinfaiter/buddacraft
+    build: .
+    environment:
+      RAM: 3G
+      VERSION: 1.18.2
+    volumes:
+      - ./data:/buddacraft
+    stdin_open: true
+    tty: true
